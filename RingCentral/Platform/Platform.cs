@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace RingCentral
 {
@@ -133,25 +134,52 @@ namespace RingCentral
 
         public ApiResponse Get(Request request)
         {
-            return Send(HttpMethod.Get, request);
+            return GetAsync(request).Result;
+        }
+
+        public async Task<ApiResponse> GetAsync(Request request)
+        {
+            return await SendAsync(HttpMethod.Get, request);
         }
 
         public ApiResponse Post(Request request)
         {
-            return Send(HttpMethod.Post, request);
+            return PostAsync(request).Result;
+        }
+
+        public async Task<ApiResponse> PostAsync(Request request)
+        {
+            return await SendAsync(HttpMethod.Post, request);
         }
 
         public ApiResponse Delete(Request request)
         {
-            return Send(HttpMethod.Delete, request);
+            return DeleteAsync(request).Result;
         }
+
+        public async Task<ApiResponse> DeleteAsync(Request request)
+        {
+            return await SendAsync(HttpMethod.Delete, request);
+        }
+
 
         public ApiResponse Put(Request request)
         {
-            return Send(HttpMethod.Put, request);
+            return PutAsync(request).Result;
         }
 
+        public async Task<ApiResponse> PutAsync(Request request)
+        {
+            return await SendAsync(HttpMethod.Put, request);
+        }
+
+
         public ApiResponse Send(HttpMethod httpMethod, Request request)
+        {
+            return SendAsync(httpMethod, request).Result;
+        }
+
+        public async Task<ApiResponse> SendAsync(HttpMethod httpMethod, Request request)
         {
             if (!LoggedIn())
             {
@@ -167,8 +195,9 @@ namespace RingCentral
                 requestMessage.ApplyHttpMethodTunneling();
             }
 
-            return new ApiResponse(_client.SendAsync(requestMessage).Result, requestMessage);
+            return new ApiResponse(await _client.SendAsync(requestMessage), requestMessage);
         }
+
 
 
         /// <summary>
